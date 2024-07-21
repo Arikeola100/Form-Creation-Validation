@@ -1,54 +1,33 @@
-document.addEventListener('DOMContentLoaded', () => {
-    (function() {
-        // Form selection
-        const form = document.getElementById('registration-form');
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
+async function fetchUserData() {
+    const apiUrl = "https://jsonplaceholder.typicode.com/users";
+    const dataContainer = document.getElementById('api-data');
 
-            // Retrieve user inputs and trim
-            const usernameInput = document.getElementById('username');
-            const username = usernameInput.value.trim();
+    // Handle the fetching process and potential errors
+    try {
+        const response = await fetch(apiUrl);
+        const users = await response.json();  // Convert the response to JSON
+        console.log(users);
 
-            const emailInput = document.getElementById('email');
-            const email = emailInput.value.trim();
+        // Clear container's initial content
+        dataContainer.innerHTML = '';
 
-            const passwordInput = document.getElementById('password');
-            const password = passwordInput.value.trim();
+        // Create a <ul> element to hold the list of users
+        const userList = document.createElement("ul");
 
-            // Initialize validation variables
-            let isValid = true;
-            let messages = [];
+        // Loop through the users array
+        users.forEach(user => {
+            let userListItem = document.createElement("li");
 
-            if (username.length < 3) { // username validation
-                isValid = false;
-                messages.push("Your username is less than 3 characters");
-            }
-
-            if (!email.includes('@') || !email.includes('.')) { // email validation
-                isValid = false;
-                messages.push("Enter a valid email");
-            }
-
-            if (password.length < 8) { // password validation
-                isValid = false;
-                messages.push("Password must be 8 characters or more");
-            }
-
-            // Feedback div selection
-            const feedbackDiv = document.getElementById('form-feedback');
-
-            // feedback display logic
-            feedbackDiv.style.display = "block";
-            if (isValid) {
-                feedbackDiv.textContent = "Registration successful";
-                feedbackDiv.style.color = "#28a745";
-                feedbackDiv.style.backgroundColor = "#baffd4";
-            } else {
-                feedbackDiv.innerHTML = messages.join("<br>");
-                feedbackDiv.style.color = "#dc3545";
-                feedbackDiv.style.backgroundColor = "#ffbaba";
-
-            }
+            // Set the text content of the <li> to the user's name
+            userListItem.textContent = user.name;
+            userList.appendChild(userListItem);
         });
-    })();
-});
+        dataContainer.appendChild(userList);
+    } catch (error) {
+        dataContainer.innerHTML = 'Failed to load user data.';
+        console.error('Error fetching data:', error);
+    }
+}
+
+// Invoke fetchUserData on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', fetchUserData);
